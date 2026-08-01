@@ -1,0 +1,9 @@
+/bin/
+/dist/
+/.prava-deploy/
+*.exe
+*.test
+coverage.out
+.env
+.env.*
+!.env.example

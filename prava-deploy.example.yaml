@@ -1,0 +1,28 @@
+# Copy to prava-deploy.yaml and review before deploying.
+version: v1
+
+project:
+  name: example-api
+  kind: container
+  runtime: go
+  build: dockerfile
+  port: 8080
+
+deploy:
+  provider: auto
+  region: bom
+  config:
+    # Non-secret identifiers only. Provider credentials belong in native login or environment state.
+    app: example-api
+    production: "false"
+
+budget:
+  monthly_max: "20.00"
+  currency: USD
+  cadence: monthly
+
+policy:
+  require_budget_approval: true
+  allowed_providers: [fly, docker]
+  denied_providers: []
+  allow_production: false

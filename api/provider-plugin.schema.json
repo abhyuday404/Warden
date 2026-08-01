@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://prava-deploy.local/schemas/provider-plugin-v1.json",
+  "title": "Prava Deploy provider plugin manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol", "id", "name", "description", "command", "capabilities", "billing"],
+  "properties": {
+    "protocol": { "const": "prava-deploy.provider/v1" },
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{1,31}$" },
+    "name": { "type": "string", "minLength": 1 },
+    "description": { "type": "string" },
+    "command": { "type": "string", "minLength": 1 },
+    "args": { "type": "array", "items": { "type": "string" } },
+    "environment": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]*$" },
+      "uniqueItems": true
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "enum": ["static", "container", "buildpack", "functions", "worker", "volume", "custom_domain", "regions", "tcp"]
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "billing": { "enum": ["none", "existing_account", "prepaid_credits", "fixed_checkout", "metered"] },
+    "merchant_url": { "type": "string", "format": "uri" },
+    "country": { "type": "string", "pattern": "^[A-Z]{2}$" }
+  }
+}

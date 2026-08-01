@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://prava-deploy.local/schemas/manifest-v1.json",
+  "title": "Prava Deploy manifest v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "project", "deploy", "budget", "policy"],
+  "properties": {
+    "version": { "const": "v1" },
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "kind": { "enum": ["static", "service", "worker", "container", "unknown"] },
+        "runtime": { "type": "string" },
+        "framework": { "type": "string" },
+        "build": { "enum": ["static", "dockerfile", "buildpack", "native"] },
+        "build_command": { "type": "string" },
+        "start_command": { "type": "string" },
+        "output_dir": { "type": "string" },
+        "port": { "type": "integer", "minimum": 1, "maximum": 65535 }
+      }
+    },
+    "deploy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "provider": { "type": "string" },
+        "region": { "type": "string" },
+        "config": { "type": "object", "additionalProperties": { "type": "string" } }
+      }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "monthly_max": { "type": "string", "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]{1,2})?$" },
+        "currency": { "type": "string", "pattern": "^[A-Z]{3}$" },
+        "cadence": { "enum": ["monthly", "one_time"] }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "require_budget_approval": { "type": "boolean" },
+        "allowed_providers": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "denied_providers": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "allow_production": { "type": "boolean" }
+      }
+    }
+  }
+}
