@@ -36,15 +36,21 @@ func (p PravaCLI) run(ctx context.Context, args ...string) (execx.Result, error)
 }
 
 func (p PravaCLI) Doctor(ctx context.Context) error {
-	result, err := p.run(ctx, "status", "--json")
+	// Prava CLI 3.1 exposes human-readable status output but no --json flag.
+	result, err := p.run(ctx, "status")
+	output := result.Stdout + "\n" + result.Stderr
+	lower := strings.ToLower(output)
+	if strings.Contains(lower, "not linked") || strings.Contains(lower, "no agent configured") {
+		return fmt.Errorf("Prava agent is not linked; run ward payment setup")
+	}
 	if err != nil {
 		return err
 	}
-	status := extractString(result.Stdout, "status", "state")
-	if status == "" && strings.Contains(strings.ToLower(result.Stdout), "not linked") {
-		return fmt.Errorf("Prava agent is not linked; run prava-deploy payment setup")
+	status := extractString(output, "status", "state")
+	if status == "" {
+		return fmt.Errorf("Prava returned an unrecognized link status")
 	}
-	if status != "" && !strings.EqualFold(status, "linked") && !strings.EqualFold(status, "ready") {
+	if !strings.EqualFold(status, "active") && !strings.EqualFold(status, "linked") && !strings.EqualFold(status, "ready") {
 		return fmt.Errorf("Prava agent is not linked: %s", status)
 	}
 	return nil

@@ -1,4 +1,4 @@
-# Copy to prava-deploy.yaml and review before deploying.
+# Copy to warden.yaml and review before deploying.
 version: v1
 
 project:

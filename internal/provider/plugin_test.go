@@ -56,3 +56,31 @@ func TestPluginRejectsUnknownProtocol(t *testing.T) {
 		t.Fatal("expected protocol rejection")
 	}
 }
+
+func TestPluginAcceptsLegacyProtocolAndUsesItForRequests(t *testing.T) {
+	root := t.TempDir()
+	path := filepath.Join(root, "legacy.provider.json")
+	manifest := map[string]any{
+		"protocol": legacyPluginProtocolV1, "id": "legacy", "name": "Legacy", "description": "v0.1",
+		"command": "legacy-provider", "capabilities": []string{"container"}, "billing": "none",
+	}
+	b, _ := json.Marshal(manifest)
+	if err := os.WriteFile(path, b, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	runner := &pluginRunner{}
+	drivers, err := LoadPlugins([]string{path}, runner)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, _, err := drivers[0].Estimate(context.Background(), domain.ProjectSpec{Name: "demo"}, nil); err != nil {
+		t.Fatal(err)
+	}
+	var request pluginRequest
+	if err := json.NewDecoder(runner.request.Stdin).Decode(&request); err != nil {
+		t.Fatal(err)
+	}
+	if request.Protocol != legacyPluginProtocolV1 {
+		t.Fatalf("legacy plugin received protocol %q", request.Protocol)
+	}
+}

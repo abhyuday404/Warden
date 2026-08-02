@@ -1,19 +1,19 @@
-# Prava Deploy
+# Warden
 
-Prava Deploy is a local-first, agentic deployment CLI. It inspects an unfamiliar repository, chooses a compatible hosting provider, creates an explainable plan, obtains a bounded infrastructure-budget approval through Prava, and then executes the deployment through deterministic provider adapters.
+Warden is a local-first, agentic deployment CLI. It inspects an unfamiliar repository, chooses a compatible hosting provider, creates an explainable plan, obtains a bounded infrastructure-budget approval through Prava, and then executes the deployment through deterministic provider adapters.
 
 The agent proposes. Go code validates. The user approves consequential actions.
 
 ## Why Prava is integrated as a budget gate
 
-Cloud providers usually meter usage and charge an account later; they do not expose a card checkout for every deployment. Prava Deploy therefore does not claim that a Prava mandate pays a cloud invoice automatically.
+Cloud providers usually meter usage and charge an account later; they do not expose a card checkout for every deployment. Warden therefore does not claim that a Prava mandate pays a cloud invoice automatically.
 
 For externally billed providers, the flow is:
 
 1. Create a deployment plan with a maximum monthly budget.
 2. Create a merchant-scoped Prava mandate for that provider and amount.
 3. The account owner approves the mandate in Prava with a passkey.
-4. Prava Deploy records only the authorization and refuses to provision without it.
+4. Warden records only the authorization and refuses to provision without it.
 5. The provider continues to bill the user's own provider account.
 
 The core deliberately keeps `authorization`, `funding`, and `provider billing` as separate concepts. Protocol v1 records a provider's billing model but does not automate settlement or prepaid-credit purchases; those require an audited provider-specific extension in a later protocol revision.
@@ -53,14 +53,14 @@ Requirements:
 - `OPENAI_API_KEY` for natural-language agent mode. Deterministic commands do not require it.
 
 ```bash
-go install github.com/abhyuday404/prava-hack/cmd/prava-deploy@latest
+go install github.com/abhyuday404/prava-hack/cmd/ward@latest
 npm install -g @prava-sdk/cli
 ```
 
 From this repository:
 
 ```bash
-go build -o bin/prava-deploy ./cmd/prava-deploy
+go build -o bin/ward ./cmd/ward
 ```
 
 ## Quick start
@@ -68,36 +68,36 @@ go build -o bin/prava-deploy ./cmd/prava-deploy
 Inspect a repository and generate a reviewed manifest:
 
 ```bash
-prava-deploy inspect
-prava-deploy init
-prava-deploy providers
+ward inspect
+ward init
+ward providers
 ```
 
 Create a bounded deployment plan:
 
 ```bash
-prava-deploy plan --provider fly --budget 25.00 --currency USD
+ward plan --provider fly --budget 25.00 --currency USD
 ```
 
 Link the deployment agent to Prava once:
 
 ```bash
-prava-deploy payment setup
-prava-deploy payment setup-poll
+ward payment setup
+ward payment setup-poll
 ```
 
 Authorize the latest plan and wait for owner approval:
 
 ```bash
-prava-deploy payment authorize --cadence monthly
-prava-deploy payment poll --authorization auth_xxx
+ward payment authorize --cadence monthly
+ward payment poll --authorization auth_xxx
 ```
 
 Then deploy:
 
 ```bash
-prava-deploy deploy --plan plan_xxx
-prava-deploy status dep_xxx
+ward deploy --plan plan_xxx
+ward status dep_xxx
 ```
 
 Use `--dry-run` to validate without provisioning. Use `--json` for automation.
@@ -109,13 +109,13 @@ Agent mode uses the OpenAI Responses API with strict function tools. The default
 Planning is read-only apart from the local journal:
 
 ```bash
-prava-deploy agent "Inspect this app, compare compatible hosts, and propose a $20 monthly plan"
+ward agent "Inspect this app, compare compatible hosts, and propose a $20 monthly plan"
 ```
 
 External actions remain disabled unless the host process grants permission:
 
 ```bash
-prava-deploy agent --execute "Deploy this app with a maximum monthly budget of $20"
+ward agent --execute "Deploy this app with a maximum monthly budget of $20"
 ```
 
 The CLI prompts separately before mandate creation, provisioning, and destruction. `--yes` suppresses terminal prompts only when combined with `--execute`; Prava still requires the owner's own approval.
@@ -124,23 +124,25 @@ The model never receives card data, provider credentials, `.env` values, or raw 
 
 ## Configuration
 
-`prava-deploy init` creates `prava-deploy.yaml`. See [prava-deploy.example.yaml](prava-deploy.example.yaml).
+`ward init` creates `warden.yaml`. See [warden.example.yaml](warden.example.yaml).
 
 Secrets are prohibited in `deploy.config`. Authenticate through provider-native login or environment variables instead. The manifest records only non-secret identifiers such as app names, regions, and Docker contexts.
 
+Copy [`.env.example`](.env.example) as a reference for supported variables. Warden intentionally does not auto-load `.env`; inject only the values you need through your shell, CI secret store, or process manager so repository inspection never becomes a secret-loading operation.
+
 Vercel deployments are previews by default. Set `deploy.config.production: "true"` and `policy.allow_production: true` together to request production explicitly.
 
-Operational state lives at `.prava-deploy/state.json`. It contains plans, authorization metadata, and deployment receipts but no API keys or payment credentials.
+Operational state lives at `.warden/state.json`. It contains plans, authorization metadata, and deployment receipts but no API keys or payment credentials. Warden reads legacy `.prava-deploy/state.json` journals and migrates them on the next write.
 
 ## Provider plugins
 
-Set `PRAVA_DEPLOY_PROVIDER_PLUGINS` to a platform path-list containing manifest files or directories:
+Set `WARD_PROVIDER_PLUGINS` to a platform path-list containing manifest files or directories:
 
 ```bash
-export PRAVA_DEPLOY_PROVIDER_PLUGINS=/opt/prava/providers
+export WARD_PROVIDER_PLUGINS=/opt/warden/providers
 ```
 
-Plugin manifests use `prava-deploy.provider/v1`. Each invocation receives one JSON request on stdin and must return one JSON response on stdout. Plugins get a minimal process environment plus only the variable names declared in their manifest.
+Plugin manifests use `warden.provider/v1`. Each invocation receives one JSON request on stdin and must return one JSON response on stdout. Plugins get a minimal process environment plus only the variable names declared in their manifest. Warden accepts the legacy `prava-deploy.provider/v1` manifest identifier during migration.
 
 See [provider plugin documentation](docs/provider-plugins.md) and the [manifest schema](api/provider-plugin.schema.json).
 
@@ -149,7 +151,7 @@ See [provider plugin documentation](docs/provider-plugins.md) and the [manifest 
 Tests and demos can bypass Prava explicitly:
 
 ```bash
-prava-deploy --payment manual --development plan --provider docker --budget 0.00 --currency USD
+ward --payment manual --development plan --provider docker --budget 0.00 --currency USD
 ```
 
 This state is labeled `development-only` and must not be described as a Prava approval.

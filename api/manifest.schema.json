@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://prava-deploy.local/schemas/manifest-v1.json",
-  "title": "Prava Deploy manifest v1",
+  "$id": "https://warden.local/schemas/manifest-v1.json",
+  "title": "Warden manifest v1",
   "type": "object",
   "additionalProperties": false,
   "required": ["version", "project", "deploy", "budget", "policy"],

@@ -1,5 +1,6 @@
 /bin/
 /dist/
+/.warden/
 /.prava-deploy/
 *.exe
 *.test
