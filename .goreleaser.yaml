@@ -1,6 +1,6 @@
 version: 2
 
-project_name: prava-deploy
+project_name: warden
 
 before:
   hooks:
@@ -8,9 +8,9 @@ before:
     - go test ./...
 
 builds:
-  - id: prava-deploy
-    main: ./cmd/prava-deploy
-    binary: prava-deploy
+  - id: ward
+    main: ./cmd/ward
+    binary: ward
     env:
       - CGO_ENABLED=0
     goos: [linux, darwin, windows]

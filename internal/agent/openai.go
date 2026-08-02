@@ -126,7 +126,7 @@ func (c Client) createResponse(ctx context.Context, instructions string, input [
 	}
 	req.Header.Set("Authorization", "Bearer "+c.APIKey)
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("User-Agent", "prava-deploy/0.1")
+	req.Header.Set("User-Agent", "warden/0.2")
 	resp, err := c.HTTP.Do(req)
 	if err != nil {
 		return response{}, fmt.Errorf("OpenAI Responses API: %w", err)

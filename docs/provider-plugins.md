@@ -1,12 +1,12 @@
 # Provider plugin protocol v1
 
-Provider plugins let Prava Deploy support a host without linking that host's SDK into the Go binary. A plugin is a trusted executable plus a `.provider.json` manifest.
+Provider plugins let Warden support a host without linking that host's SDK into the Go binary. A plugin is a trusted executable plus a `.provider.json` manifest.
 
 ## Manifest
 
 ```json
 {
-  "protocol": "prava-deploy.provider/v1",
+  "protocol": "warden.provider/v1",
   "id": "example-cloud",
   "name": "Example Cloud",
   "description": "Deploy OCI containers to Example Cloud.",
@@ -38,7 +38,7 @@ All requests contain:
 
 ```json
 {
-  "protocol": "prava-deploy.provider/v1",
+  "protocol": "warden.provider/v1",
   "method": "estimate"
 }
 ```

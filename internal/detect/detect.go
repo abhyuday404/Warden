@@ -18,7 +18,7 @@ import (
 const maxFiles = 5000
 
 var ignoredDirs = map[string]bool{
-	".git": true, ".prava-deploy": true, "node_modules": true, "vendor": true,
+	".git": true, ".warden": true, ".prava-deploy": true, "node_modules": true, "vendor": true,
 	"dist": true, "build": true, ".next": true, ".venv": true, "venv": true,
 }
 

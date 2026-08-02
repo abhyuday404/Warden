@@ -25,7 +25,7 @@ type Service struct {
 }
 
 func New(root string, registry *provider.Registry, payments payment.Authorizer) *Service {
-	return &Service{Root: root, Registry: registry, Planner: planner.Planner{Registry: registry}, Payments: payments, Store: state.New(state.PathFor(root))}
+	return &Service{Root: root, Registry: registry, Planner: planner.Planner{Registry: registry}, Payments: payments, Store: state.NewProject(root)}
 }
 
 func (s *Service) Inspect() (domain.ProjectSpec, config.Manifest, string, error) {

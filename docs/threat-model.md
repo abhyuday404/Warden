@@ -28,7 +28,7 @@ Provider CLIs own authentication and may mutate provider state. They execute onl
 
 ### Prava CLI
 
-Prava commands are marked sensitive. Prava payment credentials are never requested by Prava Deploy. The integration uses mandate setup and approval status only; it does not call mandate charge or payment-session token output.
+Prava commands are marked sensitive. Prava payment credentials are never requested by Warden. The integration uses mandate setup and approval status only; it does not call mandate charge or payment-session token output.
 
 ## Key mitigations
 

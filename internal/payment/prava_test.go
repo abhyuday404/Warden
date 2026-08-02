@@ -51,3 +51,21 @@ func TestPravaMandateFlow(t *testing.T) {
 		t.Fatalf("unexpected status: %s", auth.Status)
 	}
 }
+
+func TestPravaDoctorUsesSupportedHumanReadableStatus(t *testing.T) {
+	runner := &fakeRunner{outputs: []execx.Result{{Stdout: "Agent: Warden (aa_test)\nStatus: active\n"}}}
+	if err := (PravaCLI{Runner: runner}).Doctor(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if got := strings.Join(runner.requests[0].Args, " "); got != "status" {
+		t.Fatalf("unexpected status invocation: %q", got)
+	}
+}
+
+func TestPravaDoctorRecognizesUnlinkedAgent(t *testing.T) {
+	runner := &fakeRunner{outputs: []execx.Result{{Stdout: `No agent configured. Run: prava setup --name "<name>"`}}}
+	err := (PravaCLI{Runner: runner}).Doctor(context.Background())
+	if err == nil || !strings.Contains(err.Error(), "ward payment setup") {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}

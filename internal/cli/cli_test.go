@@ -50,7 +50,7 @@ func TestInitCommandWritesManifest(t *testing.T) {
 	if err := cmd.Execute(); err != nil {
 		t.Fatal(err)
 	}
-	b, err := os.ReadFile(filepath.Join(root, "prava-deploy.yaml"))
+	b, err := os.ReadFile(filepath.Join(root, "warden.yaml"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -77,5 +77,12 @@ func TestInteractiveGateRequiresExecuteAndConfirmation(t *testing.T) {
 	gate.execute = true
 	if err := gate.Approve(context.Background(), agent.Action{Kind: "deploy", Summary: "deploy test"}); err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestRootCommandIsWard(t *testing.T) {
+	cmd := New()
+	if cmd.Use != "ward" {
+		t.Fatalf("unexpected root command: %q", cmd.Use)
 	}
 }

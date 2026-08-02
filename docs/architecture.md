@@ -85,7 +85,7 @@ Payment and deployment states do not collapse into one status. This allows recov
 
 ## Persistence
 
-`.prava-deploy/state.json` uses schema `v1`. Updates are written to a permission-restricted temporary file, flushed, and renamed into place. On Windows, replacement falls back to remove-and-rename after the temporary file is durable.
+`.warden/state.json` uses schema `v1`. Updates are written to a permission-restricted temporary file, flushed, and renamed into place. On Windows, replacement falls back to remove-and-rename after the temporary file is durable. Legacy `.prava-deploy/state.json` journals are read and migrated on the next write.
 
 State contains operational metadata only. Provider-native CLIs retain their own authentication; OpenAI and Render credentials are sourced from environment variables.
 
@@ -94,5 +94,5 @@ State contains operational metadata only. Provider-native CLIs retain their own 
 - CLI releases follow semantic versioning. The initial product line is `0.x` while command behavior is still evolving.
 - Manifest schema: `v1`.
 - Journal schema: `v1`.
-- Provider RPC protocol: `prava-deploy.provider/v1`.
+- Provider RPC protocol: `warden.provider/v1` (legacy v0.1 manifests remain readable).
 - A breaking schema or RPC change requires a new version identifier and an explicit migration path. It must not silently reinterpret old state.

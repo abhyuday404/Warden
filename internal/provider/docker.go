@@ -28,7 +28,7 @@ func (d Docker) Estimate(context.Context, domain.ProjectSpec, map[string]string)
 func (d Docker) Deploy(ctx context.Context, plan domain.Plan, options DeployOptions) (domain.Deployment, error) {
 	dep := newDeployment(plan)
 	name := safeName(plan.Project.Name) + "-" + strings.TrimPrefix(dep.ID, "dep_")[:8]
-	image := "prava-deploy/" + safeName(plan.Project.Name) + ":" + strings.TrimPrefix(plan.ID, "plan_")[:8]
+	image := "warden/" + safeName(plan.Project.Name) + ":" + strings.TrimPrefix(plan.ID, "plan_")[:8]
 	contextName := plan.ProviderConfig["docker_context"]
 	prefix := []string{}
 	if contextName != "" {

@@ -38,7 +38,7 @@ type options struct {
 func New() *cobra.Command {
 	o := &options{out: os.Stdout, errOut: os.Stderr, in: os.Stdin, payment: "prava"}
 	root := &cobra.Command{
-		Use: "prava-deploy", Short: "Agentic, provider-agnostic deployment with Prava budget authorization",
+		Use: "ward", Short: "Warden: agentic, provider-agnostic deployment with Prava budget authorization",
 		SilenceUsage: true, SilenceErrors: true,
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			if cmd.Name() == "version" {
@@ -72,7 +72,11 @@ func Execute() error { return New().Execute() }
 func (o *options) service() (*app.Service, error) {
 	runner := execx.OSRunner{}
 	drivers := []provider.Driver{provider.Docker{Runner: runner}, provider.Vercel{Runner: runner}, provider.Fly{Runner: runner}, provider.RenderHook{}}
-	if raw := os.Getenv("PRAVA_DEPLOY_PROVIDER_PLUGINS"); raw != "" {
+	raw := os.Getenv("WARD_PROVIDER_PLUGINS")
+	if raw == "" {
+		raw = os.Getenv("PRAVA_DEPLOY_PROVIDER_PLUGINS") // Legacy v0.1 compatibility.
+	}
+	if raw != "" {
 		plugins, err := provider.LoadPlugins(filepath.SplitList(raw), runner)
 		if err != nil {
 			return nil, err
@@ -103,7 +107,7 @@ func (o *options) service() (*app.Service, error) {
 
 func (o *options) versionCommand() *cobra.Command {
 	return &cobra.Command{Use: "version", Short: "Print version", RunE: func(cmd *cobra.Command, _ []string) error {
-		_, err := fmt.Fprintf(cmd.OutOrStdout(), "prava-deploy %s (%s/%s)\n", Version, runtime.GOOS, runtime.GOARCH)
+		_, err := fmt.Fprintf(cmd.OutOrStdout(), "ward %s (%s/%s)\n", Version, runtime.GOOS, runtime.GOARCH)
 		return err
 	}}
 }
@@ -140,7 +144,7 @@ func (o *options) initCommand() *cobra.Command {
 		if err != nil {
 			return err
 		}
-		path := filepath.Join(o.root, "prava-deploy.yaml")
+		path := filepath.Join(o.root, "warden.yaml")
 		if err := writeExclusive(path, b, force); err != nil {
 			return err
 		}
@@ -283,11 +287,11 @@ func (o *options) paymentCommand() *cobra.Command {
 		if err != nil {
 			return err
 		}
-		return o.print(cmd, map[string]any{"approval_url": url, "next": "prava-deploy payment setup-poll"})
+		return o.print(cmd, map[string]any{"approval_url": url, "next": "ward payment setup-poll"})
 	}}
-	setup.Flags().StringVar(&name, "name", "Prava Deploy", "agent name shown to the owner")
+	setup.Flags().StringVar(&name, "name", "Warden", "agent name shown to the owner")
 	setup.Flags().StringVar(&platform, "platform", "custom", "Prava agent platform identifier")
-	setup.Flags().StringVar(&description, "description", "Provider-agnostic deployment budget agent", "agent description")
+	setup.Flags().StringVar(&description, "description", "Agentic provider-agnostic deployment budget controller", "agent description")
 	setupPoll := &cobra.Command{Use: "setup-poll", Short: "Wait for Prava agent-link approval", RunE: func(cmd *cobra.Command, _ []string) error {
 		if o.payment != "prava" {
 			return fmt.Errorf("payment setup requires --payment prava")

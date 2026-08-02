@@ -16,7 +16,10 @@ import (
 	"github.com/abhyuday404/prava-hack/internal/execx"
 )
 
-const PluginProtocolV1 = "prava-deploy.provider/v1"
+const (
+	PluginProtocolV1       = "warden.provider/v1"
+	legacyPluginProtocolV1 = "prava-deploy.provider/v1"
+)
 
 type PluginManifest struct {
 	Protocol     string              `json:"protocol"`
@@ -105,7 +108,7 @@ func loadPluginManifest(path string) (PluginManifest, error) {
 	if err := json.Unmarshal(b, &manifest); err != nil {
 		return PluginManifest{}, fmt.Errorf("decode provider plugin manifest %s: %w", path, err)
 	}
-	if manifest.Protocol != PluginProtocolV1 {
+	if manifest.Protocol != PluginProtocolV1 && manifest.Protocol != legacyPluginProtocolV1 {
 		return PluginManifest{}, fmt.Errorf("plugin %s uses unsupported protocol %q", path, manifest.Protocol)
 	}
 	if !regexp.MustCompile(`^[a-z][a-z0-9-]{1,31}$`).MatchString(manifest.ID) {
@@ -156,7 +159,7 @@ func (p Plugin) Info(context.Context) domain.ProviderInfo {
 }
 
 func (p Plugin) Estimate(ctx context.Context, project domain.ProjectSpec, config map[string]string) (domain.CostEstimate, []string, error) {
-	resp, err := p.call(ctx, pluginRequest{Protocol: PluginProtocolV1, Method: "estimate", Project: &project, Config: config})
+	resp, err := p.call(ctx, pluginRequest{Protocol: p.Manifest.Protocol, Method: "estimate", Project: &project, Config: config})
 	if err != nil {
 		return domain.CostEstimate{}, nil, err
 	}
@@ -168,7 +171,7 @@ func (p Plugin) Estimate(ctx context.Context, project domain.ProjectSpec, config
 
 func (p Plugin) Deploy(ctx context.Context, plan domain.Plan, options DeployOptions) (domain.Deployment, error) {
 	base := newDeployment(plan)
-	resp, err := p.call(ctx, pluginRequest{Protocol: PluginProtocolV1, Method: "deploy", Plan: &plan, DryRun: options.DryRun})
+	resp, err := p.call(ctx, pluginRequest{Protocol: p.Manifest.Protocol, Method: "deploy", Plan: &plan, DryRun: options.DryRun})
 	if err != nil {
 		return finishDeployment(base, domain.DeploymentFailed, err.Error()), err
 	}
@@ -187,7 +190,7 @@ func (p Plugin) Deploy(ctx context.Context, plan domain.Plan, options DeployOpti
 }
 
 func (p Plugin) Status(ctx context.Context, dep domain.Deployment) (domain.Deployment, error) {
-	resp, err := p.call(ctx, pluginRequest{Protocol: PluginProtocolV1, Method: "status", Deployment: &dep})
+	resp, err := p.call(ctx, pluginRequest{Protocol: p.Manifest.Protocol, Method: "status", Deployment: &dep})
 	if err != nil {
 		return dep, err
 	}
@@ -200,7 +203,7 @@ func (p Plugin) Status(ctx context.Context, dep domain.Deployment) (domain.Deplo
 }
 
 func (p Plugin) Destroy(ctx context.Context, dep domain.Deployment, dryRun bool) (domain.Deployment, error) {
-	resp, err := p.call(ctx, pluginRequest{Protocol: PluginProtocolV1, Method: "destroy", Deployment: &dep, DryRun: dryRun})
+	resp, err := p.call(ctx, pluginRequest{Protocol: p.Manifest.Protocol, Method: "destroy", Deployment: &dep, DryRun: dryRun})
 	if err != nil {
 		return dep, err
 	}

@@ -11,14 +11,22 @@ import (
 )
 
 type Store struct {
-	path string
-	mu   sync.Mutex
+	path       string
+	legacyPath string
+	mu         sync.Mutex
 }
 
 func New(path string) *Store { return &Store{path: path} }
 
 func PathFor(projectRoot string) string {
-	return filepath.Join(projectRoot, ".prava-deploy", "state.json")
+	return filepath.Join(projectRoot, ".warden", "state.json")
+}
+
+func NewProject(projectRoot string) *Store {
+	return &Store{
+		path:       PathFor(projectRoot),
+		legacyPath: filepath.Join(projectRoot, ".prava-deploy", "state.json"),
+	}
 }
 
 func emptyJournal() domain.Journal {
@@ -38,6 +46,9 @@ func (s *Store) Load() (domain.Journal, error) {
 
 func (s *Store) loadUnlocked() (domain.Journal, error) {
 	b, err := os.ReadFile(s.path)
+	if os.IsNotExist(err) && s.legacyPath != "" {
+		b, err = os.ReadFile(s.legacyPath)
+	}
 	if os.IsNotExist(err) {
 		return emptyJournal(), nil
 	}
