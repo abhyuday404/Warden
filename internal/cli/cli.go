@@ -12,13 +12,13 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/abhyuday404/prava-hack/internal/agent"
-	"github.com/abhyuday404/prava-hack/internal/app"
-	"github.com/abhyuday404/prava-hack/internal/config"
-	"github.com/abhyuday404/prava-hack/internal/domain"
-	"github.com/abhyuday404/prava-hack/internal/execx"
-	"github.com/abhyuday404/prava-hack/internal/payment"
-	"github.com/abhyuday404/prava-hack/internal/provider"
+	"github.com/abhyuday404/Warden/internal/agent"
+	"github.com/abhyuday404/Warden/internal/app"
+	"github.com/abhyuday404/Warden/internal/config"
+	"github.com/abhyuday404/Warden/internal/domain"
+	"github.com/abhyuday404/Warden/internal/execx"
+	"github.com/abhyuday404/Warden/internal/payment"
+	"github.com/abhyuday404/Warden/internal/provider"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 )
@@ -40,6 +40,10 @@ func New() *cobra.Command {
 	root := &cobra.Command{
 		Use: "ward", Short: "Warden: agentic, provider-agnostic deployment with Prava budget authorization",
 		SilenceUsage: true, SilenceErrors: true,
+		Args: cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			return o.runInteractive(cmd)
+		},
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			if cmd.Name() == "version" {
 				return nil

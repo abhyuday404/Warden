@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/abhyuday404/prava-hack/internal/cli"
+	"github.com/abhyuday404/Warden/internal/cli"
 )
 
 func main() {

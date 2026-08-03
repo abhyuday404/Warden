@@ -38,6 +38,8 @@ The OpenAI integration is intentionally an orchestration shell. Domain decisions
 
 ## Agent loop
 
+Running `ward` without a subcommand starts an interactive, repository-scoped shell. Plain text becomes a multi-turn agent message; leading-slash commands invoke deterministic application services directly. The shell keeps its Responses API items only in process memory, including encrypted reasoning, function calls, and function outputs. Text is streamed to the terminal, while completed response objects are appended to the local conversation input for subsequent turns. `/clear`, model changes, and workspace changes reset this conversational state without mutating the deployment journal.
+
 The Responses API client sends strict function definitions with `parallel_tool_calls: false`. A response can contain reasoning, messages, and function calls. The client preserves every output item and appends tool results using the matching `call_id`. With `store: false`, encrypted reasoning content is requested and replayed rather than reducing history to assistant text.
 
 The loop stops when the model returns a message, an approval gate refuses an action, or twelve tool rounds are exhausted.

@@ -6,14 +6,14 @@ import (
 	"sort"
 	"time"
 
-	"github.com/abhyuday404/prava-hack/internal/config"
-	"github.com/abhyuday404/prava-hack/internal/detect"
-	"github.com/abhyuday404/prava-hack/internal/domain"
-	"github.com/abhyuday404/prava-hack/internal/payment"
-	"github.com/abhyuday404/prava-hack/internal/planner"
-	"github.com/abhyuday404/prava-hack/internal/policy"
-	"github.com/abhyuday404/prava-hack/internal/provider"
-	"github.com/abhyuday404/prava-hack/internal/state"
+	"github.com/abhyuday404/Warden/internal/config"
+	"github.com/abhyuday404/Warden/internal/detect"
+	"github.com/abhyuday404/Warden/internal/domain"
+	"github.com/abhyuday404/Warden/internal/payment"
+	"github.com/abhyuday404/Warden/internal/planner"
+	"github.com/abhyuday404/Warden/internal/policy"
+	"github.com/abhyuday404/Warden/internal/provider"
+	"github.com/abhyuday404/Warden/internal/state"
 )
 
 type Service struct {

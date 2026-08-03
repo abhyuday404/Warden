@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/abhyuday404/prava-hack/internal/domain"
+	"github.com/abhyuday404/Warden/internal/domain"
 )
 
 type RenderHook struct{ Client *http.Client }

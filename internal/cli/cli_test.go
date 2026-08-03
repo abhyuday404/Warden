@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/abhyuday404/prava-hack/internal/agent"
+	"github.com/abhyuday404/Warden/internal/agent"
 )
 
 func TestInspectCommandJSON(t *testing.T) {
@@ -84,5 +84,59 @@ func TestRootCommandIsWard(t *testing.T) {
 	cmd := New()
 	if cmd.Use != "ward" {
 		t.Fatalf("unexpected root command: %q", cmd.Use)
+	}
+}
+
+func TestNoArgumentCommandLaunchesInteractiveShell(t *testing.T) {
+	root := t.TempDir()
+	if err := os.WriteFile(filepath.Join(root, "index.html"), []byte("<!doctype html>"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("OPENAI_API_KEY", "")
+	cmd := New()
+	var stdout, stderr bytes.Buffer
+	cmd.SetIn(strings.NewReader("/context\n/execute on\n/context\n/inspect\n/exit\n"))
+	cmd.SetOut(&stdout)
+	cmd.SetErr(&stderr)
+	cmd.SetArgs([]string{"--root", root})
+	if err := cmd.Execute(); err != nil {
+		t.Fatalf("execute: %v, stderr=%s", err, stderr.String())
+	}
+	output := stdout.String()
+	for _, expected := range []string{"Warden", "ward [plan] ›", "execute: false", "execute: true", "kind: static", "Describe what you want"} {
+		if !strings.Contains(output, expected) {
+			t.Fatalf("interactive output missing %q:\n%s", expected, output)
+		}
+	}
+}
+
+func TestInteractiveAgentErrorDoesNotCloseShell(t *testing.T) {
+	root := t.TempDir()
+	if err := os.WriteFile(filepath.Join(root, "index.html"), []byte("<!doctype html>"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("OPENAI_API_KEY", "")
+	cmd := New()
+	var stdout, stderr bytes.Buffer
+	cmd.SetIn(strings.NewReader("please inspect this\n/context\n/exit\n"))
+	cmd.SetOut(&stdout)
+	cmd.SetErr(&stderr)
+	cmd.SetArgs([]string{"--root", root})
+	if err := cmd.Execute(); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(stderr.String(), "OPENAI_API_KEY is required") || !strings.Contains(stdout.String(), "conversation_items: 0") {
+		t.Fatalf("stdout=%s\nstderr=%s", stdout.String(), stderr.String())
+	}
+}
+
+func TestInteractiveModeRejectsJSONWithoutSubcommand(t *testing.T) {
+	cmd := New()
+	cmd.SetIn(strings.NewReader("/exit\n"))
+	cmd.SetOut(&bytes.Buffer{})
+	cmd.SetErr(&bytes.Buffer{})
+	cmd.SetArgs([]string{"--json"})
+	if err := cmd.Execute(); err == nil || !strings.Contains(err.Error(), "requires a subcommand") {
+		t.Fatalf("unexpected error: %v", err)
 	}
 }

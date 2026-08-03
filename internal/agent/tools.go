@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/abhyuday404/prava-hack/internal/app"
-	"github.com/abhyuday404/prava-hack/internal/domain"
+	"github.com/abhyuday404/Warden/internal/app"
+	"github.com/abhyuday404/Warden/internal/domain"
 )
 
 type Action struct {

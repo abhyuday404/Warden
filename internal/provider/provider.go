@@ -3,7 +3,7 @@ package provider
 import (
 	"context"
 
-	"github.com/abhyuday404/prava-hack/internal/domain"
+	"github.com/abhyuday404/Warden/internal/domain"
 )
 
 type DeployOptions struct {

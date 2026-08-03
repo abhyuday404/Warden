@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/abhyuday404/prava-hack/internal/domain"
+	"github.com/abhyuday404/Warden/internal/domain"
 )
 
 func TestStoreRoundTrip(t *testing.T) {

@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/abhyuday404/prava-hack/internal/domain"
-	"github.com/abhyuday404/prava-hack/internal/ids"
+	"github.com/abhyuday404/Warden/internal/domain"
+	"github.com/abhyuday404/Warden/internal/ids"
 )
 
 // Manual is an explicit development authorizer. It never contacts a payment
