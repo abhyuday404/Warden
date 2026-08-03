@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/abhyuday404/prava-hack/internal/domain"
+	"github.com/abhyuday404/Warden/internal/domain"
 )
 
 const maxFiles = 5000

@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/abhyuday404/prava-hack/internal/domain"
-	"github.com/abhyuday404/prava-hack/internal/payment"
-	"github.com/abhyuday404/prava-hack/internal/provider"
+	"github.com/abhyuday404/Warden/internal/domain"
+	"github.com/abhyuday404/Warden/internal/payment"
+	"github.com/abhyuday404/Warden/internal/provider"
 )
 
 type serviceDriver struct{}

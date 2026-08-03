@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/abhyuday404/prava-hack/internal/domain"
-	"github.com/abhyuday404/prava-hack/internal/execx"
+	"github.com/abhyuday404/Warden/internal/domain"
+	"github.com/abhyuday404/Warden/internal/execx"
 )
 
 type pluginRunner struct{ request execx.Request }

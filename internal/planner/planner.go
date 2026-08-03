@@ -8,10 +8,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/abhyuday404/prava-hack/internal/config"
-	"github.com/abhyuday404/prava-hack/internal/domain"
-	"github.com/abhyuday404/prava-hack/internal/ids"
-	"github.com/abhyuday404/prava-hack/internal/provider"
+	"github.com/abhyuday404/Warden/internal/config"
+	"github.com/abhyuday404/Warden/internal/domain"
+	"github.com/abhyuday404/Warden/internal/ids"
+	"github.com/abhyuday404/Warden/internal/provider"
 )
 
 type Candidate struct {

@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/abhyuday404/prava-hack/internal/domain"
+	"github.com/abhyuday404/Warden/internal/domain"
 )
 
 func TestInspectViteProject(t *testing.T) {

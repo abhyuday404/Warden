@@ -3,8 +3,8 @@ package policy
 import (
 	"testing"
 
-	"github.com/abhyuday404/prava-hack/internal/config"
-	"github.com/abhyuday404/prava-hack/internal/domain"
+	"github.com/abhyuday404/Warden/internal/config"
+	"github.com/abhyuday404/Warden/internal/domain"
 )
 
 func TestAuthorizationMustMatchPlan(t *testing.T) {

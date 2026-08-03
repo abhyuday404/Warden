@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/abhyuday404/prava-hack/internal/domain"
+	"github.com/abhyuday404/Warden/internal/domain"
 	"gopkg.in/yaml.v3"
 )
 

@@ -53,7 +53,7 @@ Requirements:
 - `OPENAI_API_KEY` for natural-language agent mode. Deterministic commands do not require it.
 
 ```bash
-go install github.com/abhyuday404/prava-hack/cmd/ward@latest
+go install github.com/abhyuday404/Warden/cmd/ward@latest
 npm install -g @prava-sdk/cli
 ```
 
@@ -64,6 +64,33 @@ go build -o bin/ward ./cmd/ward
 ```
 
 ## Quick start
+
+Launch Warden from the project you want to deploy:
+
+```bash
+cd /path/to/project
+ward
+```
+
+The no-argument command opens an interactive workspace. Write a request in plain English:
+
+```text
+ward [plan] › inspect this application and recommend the best compatible host under $20 per month
+```
+
+Or use slash commands for deterministic control:
+
+```text
+/inspect
+/providers
+/plan fly 20 USD
+/execute on
+/deploy plan_xxx --dry-run
+```
+
+The interactive conversation retains model messages, reasoning items, tool calls, and tool outputs locally for the current process while continuing to send `store: false`. Use `/clear` to discard conversational context without changing deployment state, `/help` for all commands, and `/exit` to leave.
+
+The original one-shot interface remains available for scripts and CI:
 
 Inspect a repository and generate a reviewed manifest:
 

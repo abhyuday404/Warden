@@ -44,6 +44,8 @@ Prava commands are marked sensitive. Prava payment credentials are never request
 
 ## Residual risks
 
+Interactive conversation history and readline history are retained only in process memory and are not written to disk. Closing Warden or using `/clear` discards them. Deployment plans, authorization metadata, and receipts remain separate in the project journal.
+
 - Provider CLIs and plugins are supply-chain dependencies.
 - Provider pricing and billing can differ from estimates.
 - A remote Docker context may represent billed infrastructure even though Docker is marked unbilled.

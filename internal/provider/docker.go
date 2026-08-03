@@ -6,8 +6,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/abhyuday404/prava-hack/internal/domain"
-	"github.com/abhyuday404/prava-hack/internal/execx"
+	"github.com/abhyuday404/Warden/internal/domain"
+	"github.com/abhyuday404/Warden/internal/execx"
 )
 
 type Docker struct{ Runner execx.Runner }
