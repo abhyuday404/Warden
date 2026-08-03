@@ -74,6 +74,8 @@ ward
 
 The no-argument command opens an interactive workspace. Write a request in plain English:
 
+On an interactive terminal, Warden opens with a responsive wordmark, miniature guardian mascot, and workspace status rail. Narrow terminals receive a compact layout, redirected output stays plain, and the standard `NO_COLOR` environment variable disables ANSI color.
+
 ```text
 ward [plan] › inspect this application and recommend the best compatible host under $20 per month
 ```

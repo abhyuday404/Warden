@@ -9,6 +9,7 @@ This project follows Semantic Versioning. Manifest, journal, and provider protoc
 - Added tab completion, in-memory command history, execution-mode prompts, and slash commands for inspection, planning, Prava authorization, deployment, status, destruction, workspace switching, and session configuration.
 - Preserved every deterministic one-shot command for scripts and CI.
 - Updated the canonical Go module, installation, release linker, and Git remote paths for the renamed `abhyuday404/Warden` repository.
+- Added a responsive, color-aware terminal welcome screen with a Warden wordmark and miniature guardian mascot.
 
 ## 0.2.0 - 2026-08-02
 

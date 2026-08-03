@@ -38,6 +38,7 @@ type interactiveShell struct {
 	baseURL    string
 	transcript []shellTurn
 	reader     shellLineReader
+	ui         terminalUI
 }
 
 type shellLineReader interface {
@@ -80,7 +81,8 @@ func (o *options) runInteractive(cmd *cobra.Command) error {
 	if err != nil {
 		return err
 	}
-	reader, err := newShellLineReader(cmd)
+	ui := detectTerminalUI(cmd)
+	reader, err := newShellLineReader(cmd, ui.TTY)
 	if err != nil {
 		return err
 	}
@@ -93,16 +95,16 @@ func (o *options) runInteractive(cmd *cobra.Command) error {
 	handler := agent.Tools{Service: svc, Gate: gate}
 	client := agent.Client{APIKey: os.Getenv("OPENAI_API_KEY"), BaseURL: baseURL, Model: model, ReasoningEffort: reasoning}
 	shell := &interactiveShell{
-		options: o, command: cmd, service: svc, gate: gate, model: model, reasoning: reasoning, baseURL: baseURL, reader: reader,
+		options: o, command: cmd, service: svc, gate: gate, model: model, reasoning: reasoning, baseURL: baseURL, reader: reader, ui: ui,
 		session: agent.NewSession(client, agent.Instructions, handler),
 	}
 	return shell.run(cmd.Context())
 }
 
-func newShellLineReader(cmd *cobra.Command) (shellLineReader, error) {
-	input, inputIsFile := cmd.InOrStdin().(*os.File)
-	output, outputIsFile := cmd.OutOrStdout().(*os.File)
-	if inputIsFile && outputIsFile && input == os.Stdin && output == os.Stdout && readline.IsTerminal(int(input.Fd())) && readline.IsTerminal(int(output.Fd())) {
+func newShellLineReader(cmd *cobra.Command, tty bool) (shellLineReader, error) {
+	if tty {
+		input := cmd.InOrStdin().(*os.File)
+		output := cmd.OutOrStdout().(*os.File)
 		instance, err := readline.NewEx(&readline.Config{
 			Prompt:            "ward › ",
 			HistoryLimit:      200,
@@ -172,23 +174,21 @@ func (s *interactiveShell) prompt() string {
 }
 
 func (s *interactiveShell) printWelcome() {
-	out := s.command.OutOrStdout()
-	_, _ = fmt.Fprintf(out, "\nWarden %s\n", Version)
-	_, _ = fmt.Fprintf(out, "Workspace: %s\n", s.options.root)
+	view := welcomeView{Version: Version, Workspace: s.options.root, Model: s.model, Reasoning: s.reasoning, AgentReady: os.Getenv("OPENAI_API_KEY") != ""}
 	if spec, _, _, err := s.service.Inspect(); err == nil {
 		description := strings.Join(nonEmpty(spec.Runtime, spec.Framework, string(spec.Kind)), " ")
-		_, _ = fmt.Fprintf(out, "Project:   %s (%s)\n", spec.Name, description)
+		view.Project = spec.Name
+		if description != "" {
+			view.Project += " · " + description
+		}
 	} else {
-		_, _ = fmt.Fprintf(out, "Project:   inspection unavailable: %v\n", err)
+		view.Project = "inspection unavailable: " + err.Error()
 	}
-	_, _ = fmt.Fprintf(out, "Model:     %s · reasoning %s\n", s.model, s.reasoning)
-	if os.Getenv("OPENAI_API_KEY") == "" {
-		_, _ = fmt.Fprintln(out, "Agent:     unavailable until OPENAI_API_KEY is set")
+	if s.ui.TTY {
+		_, _ = fmt.Fprint(s.command.OutOrStdout(), renderTerminalWelcome(view, s.ui.Width, s.ui.Color))
 	} else {
-		_, _ = fmt.Fprintln(out, "Agent:     ready")
+		_, _ = fmt.Fprint(s.command.OutOrStdout(), renderPlainWelcome(view))
 	}
-	_, _ = fmt.Fprintln(out, "Mode:      plan-only; use /execute on to permit approved actions")
-	_, _ = fmt.Fprint(out, "\nDescribe what you want in plain English, or type /help for commands.\n\n")
 }
 
 func nonEmpty(values ...string) []string {
