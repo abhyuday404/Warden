@@ -2,6 +2,10 @@
 
 This project follows Semantic Versioning. Manifest, journal, and provider protocol versions are tracked independently because their compatibility lifetimes differ from the CLI release.
 
+## Unreleased
+
+- Added a built-in AWS Lightsail Container Services provider with Docker image build/push, regional configuration, deployment status mapping, and service cleanup.
+
 ## 0.3.0 - 2026-08-02
 
 - Added a no-argument interactive shell launched with `ward` in any project directory.

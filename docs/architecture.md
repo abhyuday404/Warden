@@ -28,6 +28,7 @@ Application service ------------ policy engine
       +---- provider registry
                    |
                    +-- Docker
+                   +-- AWS Lightsail CLI
                    +-- Fly.io CLI
                    +-- Vercel CLI
                    +-- Render hook
@@ -90,6 +91,8 @@ Payment and deployment states do not collapse into one status. This allows recov
 `.warden/state.json` uses schema `v1`. Updates are written to a permission-restricted temporary file, flushed, and renamed into place. On Windows, replacement falls back to remove-and-rename after the temporary file is durable. Legacy `.prava-deploy/state.json` journals are read and migrated on the next write.
 
 State contains operational metadata only. Provider-native CLIs retain their own authentication; OpenAI and Render credentials are sourced from environment variables.
+
+The AWS adapter targets Lightsail Container Services. It builds a local Docker image, asks the AWS CLI and `lightsailctl` to push it, and creates a public HTTP container endpoint served through Lightsail HTTPS. Region, profile name, service ARN, service name, and image reference are journaled for deterministic status and cleanup; AWS credentials are not.
 
 ## Versioning
 

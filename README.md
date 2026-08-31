@@ -38,6 +38,7 @@ Prava documentation: [CLI mandates](https://docs.prava.space/prava-pay/mandates)
 | Provider | Workloads | Execution path | Billing treatment |
 | --- | --- | --- | --- |
 | Docker | OCI containers | Local or named remote Docker context | Docker itself is unbilled; host costs are external |
+| AWS Lightsail | Dockerfile-based containers | AWS CLI v2 + Docker + `lightsailctl` | Metered existing account + Prava budget gate |
 | Fly.io | Containers and buildpacks | `flyctl` / `fly` | Metered existing account + Prava budget gate |
 | Vercel | Static and supported serverless apps | Vercel CLI | Metered existing account + Prava budget gate |
 | Render | Existing Git-connected services | Deploy hook | Metered existing account + Prava budget gate |
@@ -161,6 +162,30 @@ Copy [`.env.example`](.env.example) as a reference for supported variables. Ward
 
 Vercel deployments are previews by default. Set `deploy.config.production: "true"` and `policy.allow_production: true` together to request production explicitly.
 
+### AWS Lightsail containers
+
+The built-in `aws` provider deploys Dockerfile-based projects to an Amazon Lightsail Container Service. Install AWS CLI v2, Docker, and the AWS `lightsailctl` plugin, then authenticate with your normal AWS CLI profile. Warden never reads or stores AWS access keys.
+
+Configure `warden.yaml` with an AWS region and optional non-secret resource settings:
+
+```yaml
+deploy:
+  provider: aws
+  region: ap-south-1
+  config:
+    profile: staging       # optional; otherwise use the active AWS CLI profile
+    service: example-api   # optional; defaults to a plan-specific name
+    power: nano            # nano, micro, small, medium, large, or xlarge
+    scale: "1"             # 1-20 compute nodes
+    container: app
+    image_label: example-api
+    health_check_path: /healthz
+```
+
+The project port becomes the public HTTPS endpoint port; it defaults to `8080`. Deployment builds the Docker image locally, creates or reuses the named Lightsail service, pushes the image, and starts a deployment. `ward status` maps Lightsail service/deployment states into Warden states. `ward destroy` deletes the entire recorded Lightsail container service, which is the action required to stop its service charge; the local Docker image is retained.
+
+AWS setup and service details: [install the required tools](https://docs.aws.amazon.com/lightsail/latest/userguide/amazon-lightsail-install-software.html) and [manage container services](https://docs.aws.amazon.com/lightsail/latest/userguide/amazon-lightsail-container-services.html).
+
 Operational state lives at `.warden/state.json`. It contains plans, authorization metadata, and deployment receipts but no API keys or payment credentials. Warden reads legacy `.prava-deploy/state.json` journals and migrates them on the next write.
 
 ## Provider plugins
@@ -192,6 +217,7 @@ This state is labeled `development-only` and must not be described as a Prava ap
 - Destroying an application may not delete separately billed databases, volumes, snapshots, IPs, or DNS resources.
 - Render deploy hooks cannot query status or destroy a service.
 - Fly destruction removes the app and is treated as a destructive action.
+- AWS destruction removes the entire recorded Lightsail container service; locally built images remain on the developer machine.
 - Third-party provider plugins are trusted executable code and should be installed only from trusted publishers.
 - The CLI does not deploy or pay for categories prohibited by Prava or a provider's terms.
 

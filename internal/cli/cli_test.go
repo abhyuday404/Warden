@@ -38,6 +38,35 @@ func TestInspectCommandJSON(t *testing.T) {
 	}
 }
 
+func TestProvidersCommandIncludesBuiltInAWS(t *testing.T) {
+	root := t.TempDir()
+	if err := os.WriteFile(filepath.Join(root, "Dockerfile"), []byte("FROM scratch\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	cmd := New()
+	var stdout, stderr bytes.Buffer
+	cmd.SetOut(&stdout)
+	cmd.SetErr(&stderr)
+	cmd.SetArgs([]string{"--root", root, "--json", "providers"})
+	if err := cmd.Execute(); err != nil {
+		t.Fatalf("execute: %v, stderr=%s", err, stderr.String())
+	}
+	var candidates []struct {
+		Provider struct {
+			ID string `json:"id"`
+		} `json:"provider"`
+	}
+	if err := json.Unmarshal(stdout.Bytes(), &candidates); err != nil {
+		t.Fatal(err)
+	}
+	for _, candidate := range candidates {
+		if candidate.Provider.ID == "aws" {
+			return
+		}
+	}
+	t.Fatalf("AWS provider missing from output: %s", stdout.String())
+}
+
 func TestInitCommandWritesManifest(t *testing.T) {
 	root := t.TempDir()
 	if err := os.WriteFile(filepath.Join(root, "index.html"), []byte("<!doctype html>"), 0o600); err != nil {

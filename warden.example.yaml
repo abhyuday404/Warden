@@ -10,11 +10,18 @@ project:
 
 deploy:
   provider: auto
+  # Provider-native region (for example, bom for Fly.io or ap-south-1 for AWS).
   region: bom
   config:
     # Non-secret identifiers only. Provider credentials belong in native login or environment state.
     app: example-api
     production: "false"
+    # AWS examples (used only when provider is aws):
+    # service: example-api
+    # profile: staging
+    # power: nano
+    # scale: "1"
+    # health_check_path: /healthz
 
 budget:
   monthly_max: "20.00"
@@ -23,6 +30,6 @@ budget:
 
 policy:
   require_budget_approval: true
-  allowed_providers: [fly, docker]
+  allowed_providers: [fly, aws, docker]
   denied_providers: []
   allow_production: false

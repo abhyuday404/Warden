@@ -75,7 +75,7 @@ func Execute() error { return New().Execute() }
 
 func (o *options) service() (*app.Service, error) {
 	runner := execx.OSRunner{}
-	drivers := []provider.Driver{provider.Docker{Runner: runner}, provider.Vercel{Runner: runner}, provider.Fly{Runner: runner}, provider.RenderHook{}}
+	drivers := []provider.Driver{provider.Docker{Runner: runner}, provider.AWS{Runner: runner}, provider.Vercel{Runner: runner}, provider.Fly{Runner: runner}, provider.RenderHook{}}
 	raw := os.Getenv("WARD_PROVIDER_PLUGINS")
 	if raw == "" {
 		raw = os.Getenv("PRAVA_DEPLOY_PROVIDER_PLUGINS") // Legacy v0.1 compatibility.
@@ -85,7 +85,7 @@ func (o *options) service() (*app.Service, error) {
 		if err != nil {
 			return nil, err
 		}
-		builtin := map[string]bool{"docker": true, "vercel": true, "fly": true, "render": true}
+		builtin := map[string]bool{"docker": true, "aws": true, "vercel": true, "fly": true, "render": true}
 		for _, plugin := range plugins {
 			if id := plugin.Info(context.Background()).ID; builtin[id] {
 				return nil, fmt.Errorf("provider plugin ID %q conflicts with a built-in provider", id)

@@ -49,6 +49,8 @@ Interactive conversation history and readline history are retained only in proce
 - Provider CLIs and plugins are supply-chain dependencies.
 - Provider pricing and billing can differ from estimates.
 - A remote Docker context may represent billed infrastructure even though Docker is marked unbilled.
+- A failed AWS deployment can leave a billable Lightsail container service; Warden journals the service name and region as soon as creation succeeds so the normal destroy path can remove it.
+- Deleting an AWS Lightsail deployment deletes the complete recorded container service, but does not delete the local Docker image or unrelated AWS resources.
 - A process crash after provider success but before journal persistence can require manual reconciliation.
 - The Windows state-file replacement fallback has a brief non-atomic replacement window.
 - Provider-side resources related to an app may survive app deletion.
